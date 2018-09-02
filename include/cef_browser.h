@@ -49,6 +49,8 @@
 
 class CefBrowserHost;
 class CefClient;
+class CefDevToolsClient;
+class CefDevToolsSession;
 
 ///
 // Class used to represent a browser window. When used in the browser process
@@ -517,6 +519,13 @@ class CefBrowserHost : public virtual CefBaseRefCounted {
   ///
   /*--cef()--*/
   virtual bool HasDevTools() = 0;
+
+  ///
+  // .
+  ///
+  /*--cef()--*/
+  virtual CefRefPtr<CefDevToolsSession> AttachDevToolsClient(
+      CefRefPtr<CefDevToolsClient> client) = 0;
 
   ///
   // Retrieve a snapshot of current navigation entries as values sent to the

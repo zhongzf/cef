@@ -12,6 +12,7 @@
 
 #include "include/base/cef_bind.h"
 #include "include/cef_browser.h"
+#include "include/cef_devtools.h"
 #include "include/cef_frame.h"
 #include "include/cef_parser.h"
 #include "include/cef_ssl_status.h"
@@ -536,10 +537,27 @@ bool ClientHandler::OnBeforePopup(
                             settings);
 }
 
+class MyDevToolsClient : public CefDevToolsClient {
+ public:
+  MyDevToolsClient() {}
+
+  virtual void OnMessage(const CefString& message) override {
+    LOG(INFO) << "*** OnMessage: " << message.ToString();
+  }
+  virtual void OnHostClosed() override { LOG(INFO) << "*** OnHostClosed"; }
+
+  IMPLEMENT_REFCOUNTING(MyDevToolsClient);
+  DISALLOW_COPY_AND_ASSIGN(MyDevToolsClient);
+};
+
 void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
   CEF_REQUIRE_UI_THREAD();
 
   browser_count_++;
+
+  CefRefPtr<CefDevToolsSession> session =
+      browser->GetHost()->AttachDevToolsClient(new MyDevToolsClient());
+  session->Send("{\"id\": 0, \"method\": \"Page.enable\"}");
 
   if (!message_router_) {
     // Create the browser-side router for query handling.

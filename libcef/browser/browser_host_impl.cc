@@ -15,8 +15,10 @@
 #include "libcef/browser/browser_util.h"
 #include "libcef/browser/content_browser_client.h"
 #include "libcef/browser/context.h"
+#include "libcef/browser/devtools_client_impl.h"
 #include "libcef/browser/devtools_frontend.h"
 #include "libcef/browser/devtools_manager_delegate.h"
+#include "libcef/browser/devtools_session_impl.h"
 #include "libcef/browser/extensions/browser_extensions_util.h"
 #include "libcef/browser/extensions/extension_background_host.h"
 #include "libcef/browser/extensions/extension_system.h"
@@ -919,6 +921,23 @@ bool CefBrowserHostImpl::HasDevTools() {
   }
 
   return (devtools_frontend_ != nullptr);
+}
+
+CefRefPtr<CefDevToolsSession> CefBrowserHostImpl::AttachDevToolsClient(
+    CefRefPtr<CefDevToolsClient> client) {
+  // TODO: Check thread?
+
+  if (!client.get())
+    return nullptr;
+
+  auto agent_host = content::DevToolsAgentHost::GetOrCreateFor(web_contents());
+
+  auto client_impl = new CefDevToolsClientImpl(client); // TODO: delete it when no more need
+  agent_host->AttachClient(client_impl);
+
+  // TODO: store client reference
+
+  return new CefDevToolsSessionImpl(agent_host, client_impl);
 }
 
 void CefBrowserHostImpl::GetNavigationEntries(

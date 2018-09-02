@@ -14,6 +14,7 @@
 
 #include "include/cef_browser.h"
 #include "include/cef_client.h"
+#include "include/cef_devtools.h"
 #include "include/cef_frame.h"
 #include "include/views/cef_browser_view.h"
 #include "libcef/browser/browser_info.h"
@@ -201,6 +202,8 @@ class CefBrowserHostImpl : public CefBrowserHost,
                     const CefPoint& inspect_element_at) override;
   void CloseDevTools() override;
   bool HasDevTools() override;
+  CefRefPtr<CefDevToolsSession> AttachDevToolsClient(
+      CefRefPtr<CefDevToolsClient> client) override;
   void GetNavigationEntries(CefRefPtr<CefNavigationEntryVisitor> visitor,
                             bool current_only) override;
   void SetMouseCursorChangeDisabled(bool disabled) override;
